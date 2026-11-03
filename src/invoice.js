@@ -12,9 +12,14 @@ export function formatMoney(cents, currency = "PLN") {
   return new Intl.NumberFormat("pl-PL", { style: "currency", currency }).format(cents / 100);
 }
 
-// Half-up rounding of a percentage of an amount in cents.
+// Half-up rounding of a non-negative percentage using exact decimal arithmetic.
 function percentOf(cents, percent) {
-  return Math.round((cents * percent) / 100);
+  const [coefficient, exponent = "0"] = String(percent).split("e");
+  const [whole, fraction = ""] = coefficient.split(".");
+  const scale = fraction.length - Number(exponent);
+  const denominator = 100n * 10n ** BigInt(Math.max(0, scale));
+  const numerator = BigInt(cents) * BigInt(whole + fraction) * 10n ** BigInt(Math.max(0, -scale));
+  return Number((numerator + denominator / 2n) / denominator);
 }
 
 export function lineNet({ quantity, unitPriceCents }) {
@@ -23,12 +28,20 @@ export function lineNet({ quantity, unitPriceCents }) {
   return quantity * unitPriceCents;
 }
 
-export function calculateInvoice({ lines, vatRate }) {
+export function calculateInvoice({ lines, vatRate, discountPercent = 0 }) {
+  if (!Number.isFinite(discountPercent) || discountPercent < 0 || discountPercent > 50) {
+    throw new Error("Discount must be a number between 0 and 50%");
+  }
   if (!VAT_RATES.includes(vatRate)) throw new Error(`Unsupported VAT rate: ${vatRate}`);
+  if (vatRate === 0 && discountPercent > 0) {
+    throw new Error("Discounts are not allowed on invoices with 0% VAT");
+  }
   if (!Array.isArray(lines) || lines.length === 0) throw new Error("An invoice needs at least one line");
 
   const net = lines.reduce((sum, line) => sum + lineNet(line), 0);
-  const vat = percentOf(net, vatRate);
+  const discount = percentOf(net, discountPercent);
+  const discountedNet = net - discount;
+  const vat = percentOf(discountedNet, vatRate);
 
-  return { net, vat, gross: net + vat };
+  return { net, discount, vat, gross: discountedNet + vat };
 }

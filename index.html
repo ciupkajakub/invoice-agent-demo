@@ -19,12 +19,18 @@
     <button type="button" id="add-line">Add line</button>
 
     <label class="field">
+      Discount (%)
+      <input id="discount-percent" type="number" min="0" max="50" step="any" value="0">
+    </label>
+
+    <label class="field">
       VAT rate
       <select id="vat-rate"></select>
     </label>
 
     <dl id="totals">
       <dt>Net</dt><dd data-total="net">–</dd>
+      <dt>Discount</dt><dd data-total="discount">–</dd>
       <dt>VAT</dt><dd data-total="vat">–</dd>
       <dt>Gross</dt><dd data-total="gross">–</dd>
     </dl>
