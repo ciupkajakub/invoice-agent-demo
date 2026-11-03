@@ -84,13 +84,17 @@ Show me each change before you write it. Scalars go through `hermes config set`.
       - "<CHANNEL_ID>"
   ```
 
-- **Approvals.** `hermes config set approvals.mode manual`, so every dangerous command waits for a human in the thread (Slack shows buttons, or `!approve` / `!deny` as text). Add deny rules that nobody can approve:
+- **Approvals.** `hermes config set approvals.mode manual`, so every dangerous command waits for a human in the thread (Slack shows buttons, or `!approve` / `!deny` as text). Add deny rules that nobody can approve. They match command text, so they are a seatbelt; branch protection from Stage 3 is the real guarantee:
 
   ```yaml
   approvals:
     deny:
-      - "git push --force*"
+      - "git push *--force*"
+      - "git push -f*"
+      - "git push * -f"
+      - "git push * -f *"
       - "gh pr merge*"
+      - "gh api *merge*"
   ```
 
 - **Channel instructions.** Add a `channel_prompts` entry under the same `slack:` block:
