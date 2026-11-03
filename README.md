@@ -8,3 +8,7 @@ npm start   # http://localhost:3000
 ```
 
 Requires Node 24. No dependencies.
+
+## Support
+
+For support, contact [help@example.test](mailto:help@example.test).
