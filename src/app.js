@@ -2,6 +2,7 @@ import { VAT_RATES, calculateInvoice, formatMoney, lineNet, toCents } from "./in
 
 const tbody = document.querySelector("#lines tbody");
 const vatSelect = document.querySelector("#vat-rate");
+const discountInput = document.querySelector("#discount-percent");
 const errorBox = document.querySelector("#error");
 
 for (const rate of VAT_RATES) {
@@ -37,11 +38,19 @@ function render() {
     for (const line of lines) {
       line.row.querySelector("[data-line-net]").textContent = formatMoney(lineNet(line));
     }
-    const totals = calculateInvoice({ lines, vatRate: Number(vatSelect.value) });
+    const totals = calculateInvoice({
+      lines,
+      vatRate: Number(vatSelect.value),
+      discountPercent: Number(discountInput.value),
+    });
     for (const [key, cents] of Object.entries(totals)) {
-      document.querySelector(`[data-total="${key}"]`).textContent = formatMoney(cents);
+      const amount = formatMoney(cents);
+      document.querySelector(`[data-total="${key}"]`).textContent = key === "discount" ? `−${amount}` : amount;
     }
   } catch (error) {
+    for (const total of document.querySelectorAll("[data-total]")) {
+      total.textContent = "–";
+    }
     errorBox.textContent = error.message;
   }
 }
