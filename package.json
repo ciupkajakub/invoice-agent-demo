@@ -1,0 +1,13 @@
+{
+  "name": "invoice-agent-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A small invoice calculator used to demo a Slack-driven coding agent.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test",
+    "check": "node --check src/invoice.js && node --check src/app.js && node --check scripts/serve.js"
+  }
+}

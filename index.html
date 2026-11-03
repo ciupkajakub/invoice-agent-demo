@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice calculator</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <main>
+    <h1>Invoice calculator</h1>
+
+    <table id="lines">
+      <thead>
+        <tr><th>Item</th><th>Qty</th><th>Unit price (net)</th><th>Line net</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" id="add-line">Add line</button>
+
+    <label class="field">
+      VAT rate
+      <select id="vat-rate"></select>
+    </label>
+
+    <dl id="totals">
+      <dt>Net</dt><dd data-total="net">–</dd>
+      <dt>VAT</dt><dd data-total="vat">–</dd>
+      <dt>Gross</dt><dd data-total="gross">–</dd>
+    </dl>
+    <p id="error" role="alert"></p>
+  </main>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
