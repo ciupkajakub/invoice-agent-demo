@@ -33,6 +33,9 @@ export function calculateInvoice({ lines, vatRate, discountPercent = 0 }) {
     throw new Error("Discount must be a number between 0 and 50%");
   }
   if (!VAT_RATES.includes(vatRate)) throw new Error(`Unsupported VAT rate: ${vatRate}`);
+  if (vatRate === 0 && discountPercent > 0) {
+    throw new Error("Discounts are not allowed on invoices with 0% VAT");
+  }
   if (!Array.isArray(lines) || lines.length === 0) throw new Error("An invoice needs at least one line");
 
   const net = lines.reduce((sum, line) => sum + lineNet(line), 0);

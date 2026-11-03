@@ -39,6 +39,22 @@ test("calculateInvoice handles the 0% rate", () => {
   assert.deepEqual(result, { net: 999, discount: 0, vat: 0, gross: 999 });
 });
 
+test("calculateInvoice rejects any positive discount with 0% VAT", () => {
+  for (const discountPercent of [0.01, 10, 50]) {
+    for (const unitPriceCents of [0, 1, 10000]) {
+      assert.throws(() => calculateInvoice({
+        lines: [{ quantity: 1, unitPriceCents }], vatRate: 0, discountPercent,
+      }), /Discounts are not allowed on invoices with 0% VAT/);
+    }
+  }
+});
+
+test("calculateInvoice permits an explicit zero discount with 0% VAT", () => {
+  assert.deepEqual(calculateInvoice({
+    lines: [{ quantity: 1, unitPriceCents: 999 }], vatRate: 0, discountPercent: 0,
+  }), { net: 999, discount: 0, vat: 0, gross: 999 });
+});
+
 test("calculateInvoice rejects discounts outside 0–50% and non-finite/non-numeric values", () => {
   for (const discountPercent of [-0.01, 50.01, NaN, Infinity, -Infinity, "10", null]) {
     assert.throws(() => calculateInvoice({
@@ -67,14 +83,14 @@ test("calculateInvoice rounds a 50% half-cent discount up before calculating VAT
 test("calculateInvoice rounds fractional discounts on the invoice net, not each line", () => {
   assert.deepEqual(calculateInvoice({
     lines: [{ quantity: 1, unitPriceCents: 4 }, { quantity: 1, unitPriceCents: 4 }],
-    vatRate: 0, discountPercent: 12.5,
-  }), { net: 8, discount: 1, vat: 0, gross: 7 });
+    vatRate: 8, discountPercent: 12.5,
+  }), { net: 8, discount: 1, vat: 1, gross: 8 });
 });
 
 test("calculateInvoice rounds decimal percentage ties half up without floating-point drift", () => {
   assert.deepEqual(calculateInvoice({
-    lines: [{ quantity: 1, unitPriceCents: 10000 }], vatRate: 0, discountPercent: 1.005,
-  }), { net: 10000, discount: 101, vat: 0, gross: 9899 });
+    lines: [{ quantity: 1, unitPriceCents: 10000 }], vatRate: 8, discountPercent: 1.005,
+  }), { net: 10000, discount: 101, vat: 792, gross: 10691 });
 });
 
 test("calculateInvoice rounds VAT half up on the discounted net", () => {
