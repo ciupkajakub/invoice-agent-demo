@@ -2,6 +2,30 @@
 
 export const VAT_RATES = [23, 8, 5, 0];
 
+export function defaultPaymentDays(grossCents) {
+  return grossCents < 10000 ? 7 : 14;
+}
+
+export function calculateDueDate(issueDate, paymentDays = 14) {
+  if (!Number.isInteger(paymentDays) || paymentDays < 1 || paymentDays > 90) {
+    throw new Error("Payment term must be a whole number from 1 to 90 days");
+  }
+  const date = new Date(`${issueDate}T00:00:00.000Z`);
+  if (typeof issueDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(issueDate)
+      || !Number.isFinite(date.getTime()) || date.getUTCFullYear() < 1
+      || date.toISOString().slice(0, 10) !== issueDate) {
+    throw new Error("Issue date must be a valid date");
+  }
+  date.setUTCDate(date.getUTCDate() + paymentDays);
+  // Use UTC calendar dates so local timezone and DST cannot shift the deadline.
+  if (date.getUTCDay() === 6) date.setUTCDate(date.getUTCDate() + 2);
+  if (date.getUTCDay() === 0) date.setUTCDate(date.getUTCDate() + 1);
+  if (date.getUTCFullYear() > 9999) {
+    throw new Error("Due date must not exceed year 9999");
+  }
+  return date.toISOString().slice(0, 10).split("-").reverse().join(".");
+}
+
 export function toCents(amount) {
   const value = Number(amount);
   if (!Number.isFinite(value)) throw new Error(`Not a number: ${amount}`);

@@ -1,8 +1,21 @@
-import { VAT_RATES, calculateInvoice, formatMoney, lineNet, toCents } from "./invoice.js";
+import { VAT_RATES, calculateDueDate, calculateInvoice, defaultPaymentDays, formatMoney, lineNet, toCents } from "./invoice.js";
 
 const tbody = document.querySelector("#lines tbody");
 const vatSelect = document.querySelector("#vat-rate");
 const errorBox = document.querySelector("#error");
+const issueDateInput = document.querySelector("#issue-date");
+const paymentDaysInput = document.querySelector("#payment-days");
+const dueDateOutput = document.querySelector("[data-due-date]");
+let paymentTermEdited = false;
+
+paymentDaysInput.addEventListener("input", () => {
+  paymentTermEdited = true;
+});
+
+// Initialize the date input using the user's local calendar date, not UTC.
+const today = new Date();
+issueDateInput.value = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"),
+  String(today.getDate()).padStart(2, "0")].join("-");
 
 for (const rate of VAT_RATES) {
   vatSelect.append(new Option(`${rate}%`, rate));
@@ -32,6 +45,7 @@ function readLines() {
 
 function render() {
   errorBox.textContent = "";
+  dueDateOutput.textContent = "–";
   try {
     const lines = readLines();
     for (const line of lines) {
@@ -41,6 +55,8 @@ function render() {
     for (const [key, cents] of Object.entries(totals)) {
       document.querySelector(`[data-total="${key}"]`).textContent = formatMoney(cents);
     }
+    if (!paymentTermEdited) paymentDaysInput.value = defaultPaymentDays(totals.gross);
+    dueDateOutput.textContent = calculateDueDate(issueDateInput.value, paymentDaysInput.valueAsNumber);
   } catch (error) {
     errorBox.textContent = error.message;
   }
