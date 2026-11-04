@@ -4,8 +4,8 @@
 
 1. **Check the machine.** Git, the GitHub CLI, version managers, and whether the machine sleeps.
 2. **Install Hermes and connect a model.** The installer runs without its own wizard, and you log in with the plan you already pay for.
-3. **Give the agent its own GitHub account.** It gets write access to one repo, a token, and a separate home folder, so it never pushes as you. Branch protection stops it from merging.
-4. **Give it a workspace.** A clone of the repo, with a check that the tests pass the way the agent will run them.
+3. **Give the agent its own GitHub account.** It gets write access to one repo, a token, and a separate home folder, so it never pushes as you. Branch protection (one approval, a fresh approval after any new push, no bypassing for admins) stops it from merging.
+4. **Give it a workspace.** A clone of the repo, with a check that the tests pass the way the agent will run them, and a "Slack thread" field in the pull request template.
 5. **Create the Slack app.** From a manifest that Hermes generates, with Socket Mode, so the machine needs no public URL.
 6. **Make the thread the unit of work.** One allowed channel, shared thread sessions, approvals for risky commands, and the channel instructions, including the thread link in every pull request.
 7. **Start the agent** as a background service.
@@ -83,7 +83,7 @@ It's a guardrail, not a wall. It stops the agent from reading secrets by acciden
 
 ## The key settings
 
-The settings the prompt writes to the agent's `~/.hermes/config.yaml`, shown with the demo's channel and repo. They are what makes the thread the unit of work:
+The settings the prompt writes to the agent's `~/.hermes/config.yaml`; the prompt fills in the placeholders. They are what makes the thread the unit of work:
 
 ```yaml
 approvals:
@@ -97,20 +97,29 @@ approvals:
     - "gh api *merge*"
 
 slack:
-  allowed_channels: ["C0CEEBN78JX"]   # the agent's channel only
+  allowed_channels: ["<CHANNEL_ID>"]   # the agent's channel only
   channel_prompts:
-    "C0CEEBN78JX": |
-      You are the team's coding agent for ciupkajakub/invoice-agent-demo.
+    "<CHANNEL_ID>": |
+      You are the team's coding agent for <owner/name>. Your working copy
+      is <absolute path of the workspace>. In your shell, ~ is your own
+      home, not the user's, so always use absolute paths.
       One task per thread. Read the whole thread before you start and ask
       in the thread when the request is unclear.
-      Start each task on a new branch from the latest main. Run the tests
-      before you open a pull request with gh pr create --base main.
+      Start each task on a new branch from the latest <base branch>, never
+      commit to <base branch> itself. Run the repo's tests and linters
+      before you open a pull request.
+      Open the pull request with gh pr create --base <base branch> and post
+      its link in the thread.
       In the pull request description add a "Slack thread" section with a
-      link to this thread and a 2-3 sentence summary of what was decided here.
+      link to this thread and a 2-3 sentence summary of what was decided
+      here. Build the link from the channel and thread IDs in your session
+      context: https://<workspace>.slack.com/archives/<channel ID>/p<thread
+      timestamp without the dot>. If the IDs are missing, ask for the link
+      in the thread. Refer to people by name, never with a guessed pronoun.
       Never merge. A human reviews and merges.
 ```
 
-And the field in the repo's pull request template that the last instruction fills:
+And the field in the repo's pull request template that the instructions fill. If the repo has no such field, the prompt offers to add it in stage 4:
 
 ```markdown
 ## Slack thread
