@@ -11,7 +11,7 @@ Requires Node 24. No dependencies.
 
 ## Set up your own Slack agent
 
-[`setup-prompt.md`](setup-prompt.md) sets up a basic team agent like the one that works on this repo: a Hermes Agent people tag in a Slack thread, which opens a pull request for a human to review. Copy the whole file (the **Copy raw file** button above it) into Claude Code, Codex or another coding agent on the machine that will host the agent.
+[The setup prompt](https://gist.github.com/ciupkajakub/4b6373f731b70d0a5f16677d09cdc186) sets up a basic team agent like the one that works on this repo: a Hermes Agent people tag in a Slack thread, which opens a pull request for a human to review. Copy the whole file (the **Copy** button next to it) into Claude Code, Codex or another coding agent on the machine that will host the agent.
 
 You need a Slack workspace, a GitHub repo and access to an AI model (a ChatGPT plan or an API key). The prompt walks you through the rest in about 1.5 hours and ends with seven acceptance tests. [What the setup prompt does](docs/setup-details.md) explains each stage, the configuration it writes and the guardrails for the setup agent.
 

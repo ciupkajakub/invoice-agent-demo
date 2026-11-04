@@ -1,6 +1,6 @@
 # What the setup prompt does
 
-[`setup-prompt.md`](../setup-prompt.md) sets up a team agent in Slack. This page is for technical readers who want to know what it changes before they run it. The prompt takes about an hour and a half, in eight stages:
+[The setup prompt](https://gist.github.com/ciupkajakub/4b6373f731b70d0a5f16677d09cdc186) sets up a team agent in Slack. This page is for technical readers who want to know what it changes before they run it. The prompt takes about an hour and a half, in eight stages:
 
 1. **Check the machine.** Git, the GitHub CLI, version managers, and whether the machine sleeps.
 2. **Install Hermes and connect a model.** The installer runs without its own wizard, and you log in with the plan you already pay for.
