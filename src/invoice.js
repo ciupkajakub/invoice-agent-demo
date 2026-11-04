@@ -2,6 +2,10 @@
 
 export const VAT_RATES = [23, 8, 5, 0];
 
+export function defaultPaymentDays(grossCents) {
+  return grossCents < 10000 ? 7 : 14;
+}
+
 export function calculateDueDate(issueDate, paymentDays = 14) {
   if (!Number.isInteger(paymentDays) || paymentDays < 1 || paymentDays > 90) {
     throw new Error("Payment term must be a whole number from 1 to 90 days");

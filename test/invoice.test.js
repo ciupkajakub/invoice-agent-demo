@@ -2,6 +2,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculateDueDate, calculateInvoice, formatMoney, lineNet, toCents } from "../src/invoice.js";
 
+test("defaultPaymentDays uses 7 days strictly below 100 PLN gross", async () => {
+  const { defaultPaymentDays } = await import("../src/invoice.js");
+  for (const [gross, expected] of [[0, 7], [1, 7], [9999, 7], [10000, 14], [10001, 14], [200000, 14]]) {
+    assert.equal(defaultPaymentDays(gross), expected);
+  }
+  const { gross } = calculateInvoice({ lines: [{ quantity: 1, unitPriceCents: 8200 }], vatRate: 23 });
+  assert.equal(defaultPaymentDays(gross), 14, "use gross including VAT, not net");
+});
+
 test("calculateDueDate defaults to 14 calendar days and formats DD.MM.YYYY", () => {
   assert.equal(calculateDueDate("2026-11-04"), "18.11.2026");
 });
