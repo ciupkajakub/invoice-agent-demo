@@ -100,23 +100,7 @@ slack:
   allowed_channels: ["<CHANNEL_ID>"]   # the agent's channel only
   channel_prompts:
     "<CHANNEL_ID>": |
-      You are the team's coding agent for <owner/name>. Your working copy
-      is <absolute path of the workspace>. In your shell, ~ is your own
-      home, not the user's, so always use absolute paths.
-      One task per thread. Read the whole thread before you start and ask
-      in the thread when the request is unclear.
-      Start each task on a new branch from the latest <base branch>, never
-      commit to <base branch> itself. Run the repo's tests and linters
-      before you open a pull request.
-      Open the pull request with gh pr create --base <base branch> and post
-      its link in the thread.
-      In the pull request description add a "Slack thread" section with a
-      link to this thread and a 2-3 sentence summary of what was decided
-      here. Build the link from the channel and thread IDs in your session
-      context: https://<workspace>.slack.com/archives/<channel ID>/p<thread
-      timestamp without the dot>. If the IDs are missing, ask for the link
-      in the thread. Refer to people by name, never with a guessed pronoun.
-      Never merge. A human reviews and merges.
+      # The full instructions are in Stage 6 of the setup prompt (link at the top).
 ```
 
 And the field in the repo's pull request template that the instructions fill. If the repo has no such field, the prompt offers to add it in stage 4:
